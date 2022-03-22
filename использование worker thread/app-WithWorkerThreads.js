@@ -56,6 +56,7 @@ setTimeout(() => {
 main();
 
 /**
+ * Прошло 2 секунды!!!!!
  * Worker threadID: 2
  * Worker threadID: 4
  * worker exited
