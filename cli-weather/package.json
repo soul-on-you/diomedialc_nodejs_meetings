@@ -1,0 +1,21 @@
+{
+  "name": "cli-weather",
+  "version": "1.0.0",
+  "description": "",
+  "main": "weather.js",
+  "bin": {
+    "weather": "./src/weather.js"
+  },
+  "type":"module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/weather.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "commander": "^9.1.0"
+  }
+}
