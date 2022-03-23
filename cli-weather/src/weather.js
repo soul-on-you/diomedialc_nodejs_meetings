@@ -8,7 +8,7 @@
 // console.log(options);
 // const limit = options.first ? 1 : undefined;
 // console.log(program.args[0].split(options.separator, limit));
-
+import { printSuccess, printError } from "../services/log.service.js";
 import { Command } from "commander";
 const program = new Command();
 
@@ -18,7 +18,7 @@ program
   .version("1.0.0")
   .option("-c, --city <string>", "watch weather in city")
   .option(
-    "-t --token <string>",
+    "-t --token <API_KEY>",
     "If you have your prod API token",
     "MyToken665"
   )
@@ -48,13 +48,13 @@ program.parse(process.argv);
 
 const options = program.opts();
 if (options.debug) console.log(options);
-if (options.city) console.log(`City : ${options.city}`);
+if (options.city) printSuccess(`City : ${options.city}`);
 // console.log("pizza details:");
 // if (options.small) console.log("- small pizza size");
 // if (options.pizzaType) console.log(`- ${options.pizzaType}`);
 
 const initCLI = () => {
-  console.log(process.argv);
+  // console.log(process.argv);
   /**
    * [ashling@ashling cli-weather]$ npm start fhefhsjf djhjfhsdjfhskd
    *   > cli-weather@1.0.0 start
@@ -69,4 +69,3 @@ const initCLI = () => {
 };
 
 initCLI();
-
