@@ -1,14 +1,10 @@
-// const { program } = require("commander");
-
-// program.option("--first").option("-s, --separator <char>");
-
-// program.parse();
-
-// const options = program.opts();
-// console.log(options);
-// const limit = options.first ? 1 : undefined;
-// console.log(program.args[0].split(options.separator, limit));
 import { printSuccess, printError } from "../services/log.service.js";
+import { getWeather } from "../services/api.service.js";
+import {
+  saveKeyValue,
+  getKeyValue,
+  STORAGE_DICTIONARY,
+} from "../services/storage.service.js";
 import { Command } from "commander";
 const program = new Command();
 
@@ -19,11 +15,11 @@ program
   .option("-c, --city <string>", "watch weather in city")
   .option(
     "-t --token <API_KEY>",
-    "If you have your prod API token",
-    "MyToken665"
+    "If you have your prod API token"
+    // "MyToken665"
   )
   .option("-d, --debug", "output extra debugging");
-
+program.parse(process.argv);
 // program
 //   .command("split")
 //   .description("Split a string into substrings and display as an array")
@@ -37,35 +33,62 @@ program
 //     console.log(str.split(options.separator, limit));
 //   });
 
-// program.parse();
+const saveToken = async (token) => {
+  try {
+    await saveKeyValue(STORAGE_DICTIONARY.token, token);
+    printSuccess("Токен сохранен");
+  } catch (e) {
+    printError(e.message);
+  }
+};
 
-// program
-//   .option("-d, --debug", "output extra debugging")
-//   .option("-s, --small", "small pizza size")
-//   .option("-p, --pizza-type <type>", "flavour of pizza");
+const loadToken = async () => {
+  try {
+    return await getKeyValue(STORAGE_DICTIONARY.token);
+  } catch (e) {
+    printError(e.message);
+  }
+};
 
-program.parse(process.argv);
+const Forcast = async (city, weatherToken) => {
+  if (city) {
+    try {
+      const weatherResponse = await getWeather(city, weatherToken);
+      console.log(weatherResponse);
+    } catch (err) {
+      if (err?.response?.status == 404) {
+        printError("Неправильно указан город");
+      } else if (err?.response?.status == 401) {
+        printError("Неправильно указан токен");
+      } else {
+        console.log(err);
+        printError(err.message);
+      }
+    }
+  }
+};
 
 const options = program.opts();
-if (options.debug) console.log(options);
-if (options.city) printSuccess(`City : ${options.city}`);
-// console.log("pizza details:");
-// if (options.small) console.log("- small pizza size");
-// if (options.pizzaType) console.log(`- ${options.pizzaType}`);
+if (options.debug) {
+  console.log(options);
+}
+if (options.city) {
+  printSuccess(`City : ${options.city}`);
+}
 
-const initCLI = () => {
-  // console.log(process.argv);
-  /**
-   * [ashling@ashling cli-weather]$ npm start fhefhsjf djhjfhsdjfhskd
-   *   > cli-weather@1.0.0 start
-   * > node ./src/weather.js "fhefhsjf" "djhjfhsdjfhskd"
-   * [
-   *     '/usr/bin/node',
-   *     '/home/ashling/nodejs_training/cli-weather/src/weather.js',
-   *     'fhefhsjf',
-   *     'djhjfhsdjfhskd'
-   * ]
-   */
+if (options.token) {
+  await saveToken(options.token);
+}
+
+const initCLI = async () => {
+  const weatherToken = await loadToken();
+
+  if (!weatherToken) {
+    printError("Не задан ключ API задайте его через команду -t [API_KEY]");
+    return;
+  }
+
+  await Forcast(options.city, weatherToken);
 };
 
 initCLI();
